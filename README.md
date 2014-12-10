@@ -4,12 +4,13 @@
 
 # [gulp](http://gulpjs.com)-revsolve
 
-Resolves all asset references to absolute paths. Assets processed
+Resolves asset references to absolute paths. Revisioned assets processed
 by [gulp-rev](https://github.com/sindresorhus/gulp-rev) can be replaced as well.
 
 This plugin is based on awesome [gulp-revplace](https://github.com/tenphi/gulp-revplace) by [Andrey Yamanov](https://github.com/tenphi).
 It removes dependency on [mmmagic](https://github.com/mscdex/mmmagic) which caused problems with installation.
-Another improvement is that it also resolves non revisioned files and allows more grained control over assets.
+In contrast to [gulp-revplace](https://github.com/tenphi/gulp-revplace) this plugin provides more grained control over
+assets with additional options.
 
 ## Install
 
@@ -36,7 +37,7 @@ gulp.task('default', function () {
       .pipe(rev())
   )
     .pipe(revsolve())
-    .pipe(gulp.dest('dest'));
+    .pipe(gulp.dest('somedir'));
 });
 ```
 
@@ -53,17 +54,7 @@ _Type_: [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 _Usage_: Sets a custom regex to match on your files.
 
-_Default_: `/(?:url\(["']?(.*?)['"]?\)|src=["'](.*?)['"]|src=([^\s\>]+)(?:\>|\s)|href=["'](.*?)['"]|href=([^\s\>]+)(?:\>|\s)|ASSET\(['"](.+)['"]\))/g`
-
-You can define and use simple ASSET() function that only returns what it was given. Use it to declare asset urls in scripts. It'll help plugin to find all assets.
-
-```javascript
-function ASSET(s) {return s;}
-```
-
-Following expression will allow you to replace template urls in Angular.js:
-
-_RegExp_: `/(?:url\(["']?(.*?)['"]?\)|src=["'](.*?)['"]|src=([^\s\>]+)(?:\>|\s)|href=["']([^'"]+?)['"]|href=([^\s\>]+)(?:\>|\s)|ASSET\(['"](.+)['"]\)|templateUrl\:\s*?["'](.*?)['"])/g`
+_Default_: `/(?:url\(["']?(.*?)['"]?\)|src=["'](.*?)['"]|src=([^\s\>]+)(?:\>|\s)|href=["'](.*?)['"]|href=([^\s\>]+)(?:\>|\s))/g`
 
 #### cwd
 _Type_: `String`
@@ -125,9 +116,9 @@ _Default_: true
 #### debug
 _Type_: `Integer`
 
-_Usage_: Activate debug mode.
+_Usage_: Activate debug by specifying verbosity.
 
-_Values_: 0|1|2
+_Values_: 0 1 2
 
 _Default_: 0
 
