@@ -6,6 +6,7 @@ var
   gulp = require('gulp'),
   describe = require('mocha').describe,
   beforeEach = require('mocha').beforeEach,
+  after = require('mocha').after,
   es = require('event-stream'),
   it = require('mocha').it,
   expect = require('chai').expect,
@@ -186,11 +187,11 @@ describe('gulp-revsolve', function () {
       });
   });
 
-  it('should resolve files in additional dirs', function (cb) {
+  it('should resolve files matching specified pattern', function (cb) {
     var filter = require('gulp-filter')('**/*.css');
     gulp
       .src([input('styles/style.css'), input('images/*.*'), input('fonts/*.*')], { base: input() })
-      .pipe(revsolve({ cwd: '.', base: '.', dirs: '**' }))
+      .pipe(revsolve({ cwd: '.', base: '.', patterns: '**' }))
       .pipe(filter)
       .pipe(require('gulp-rename')({ basename: 'style' }))
       .pipe(gulp.dest(output()))

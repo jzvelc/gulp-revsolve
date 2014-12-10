@@ -13,7 +13,7 @@ module.exports = function (options) {
   options = _.assign({
     regex: /(?:url\(["']?(.*?)['"]?\)|src=["'](.*?)['"]|src=([^\s\>]+)(?:\>|\s)|href=["'](.*?)['"]|href=([^\s\>]+)(?:\>|\s)|ASSET\(['"](.+)['"]\))/g,
     debug: 0,
-    dirs: [],
+    patterns: [],
     addSrcPrefix: '',
     addDestPrefix: '/',
     skipUnmentioned: false,
@@ -26,12 +26,12 @@ module.exports = function (options) {
     options.cwd = path.resolve(options.cwd);
   }
 
-  if (_.isString(options.dirs)) {
-    options.dirs = [options.dirs];
+  if (_.isString(options.patterns)) {
+    options.patterns = [options.patterns];
   }
 
-  for (var i = 0; i < options.dirs.length; i++) {
-    options.dirs[i] = path.relative(options.cwd, options.dirs[i]);
+  for (var i = 0; i < options.patterns.length; i++) {
+    options.patterns[i] = path.relative(options.cwd, options.patterns[i]);
   }
 
   if (options.base) {
@@ -165,8 +165,8 @@ module.exports = function (options) {
           matched = absolutePath === url || relativePath === url;
           if (!matched) {
             var minimatch = require('minimatch');
-            for (var i = 0; i < options.dirs.length; i++) {
-              if (minimatch(absolutePath, path.join(options.dirs[i], url), {matchBase: true})) {
+            for (var i = 0; i < options.patterns.length; i++) {
+              if (minimatch(absolutePath, path.join(options.patterns[i], url), {matchBase: true})) {
                 matched = true;
                 break;
               }

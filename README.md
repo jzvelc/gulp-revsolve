@@ -1,5 +1,6 @@
 [![NPM version](https://badge.fury.io/js/gulp-revsolve.svg)](http://badge.fury.io/js/gulp-revsolve)
 [![Build Status](https://travis-ci.org/jzvelc/gulp-revsolve.svg?branch=master)](https://travis-ci.org/jzvelc/gulp-revsolve)
+[![Coverage Status](https://coveralls.io/repos/jzvelc/gulp-revsolve/badge.png)](https://coveralls.io/r/jzvelc/gulp-revsolve)
 
 # [gulp](http://gulpjs.com)-revsolve
 
@@ -76,10 +77,10 @@ _Type_: `String`
 
 _Usage_: Set this to override asset base paths. This is useful when dealing with sources which have different base paths.
 
-#### dirs
+#### patterns
 _Type_: `Array`
 
-_Usage_: Glob dir patterns which will be used to perform additional matching. Patterns are prepended to source paths.
+_Usage_: Glob patterns which will be used to perform additional matching. Patterns are prepended to source paths.
 
 _Default_: []
 

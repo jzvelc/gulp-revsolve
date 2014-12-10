@@ -21,6 +21,6 @@ gulp.task('coveralls', function (cb) {
   var coveralls = require('gulp-coveralls');
 
   gulp
-    .src('./test/coverage/**/lcov.info')
+    .src('./test/coverage/lcov.info')
     .pipe(coveralls());
 });
