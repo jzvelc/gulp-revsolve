@@ -10,7 +10,7 @@ Another improvement is that it also resolves non revisioned files and allows mor
 ## Install
 
 ```
-npm install --save-dev gulp-revplace
+npm install --save-dev gulp-revsolve
 ```
 
 ## Usage
