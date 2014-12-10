@@ -17,13 +17,6 @@ gulp.task('test', function (cb) {
     });
 });
 
-gulp.task('coveralls', function (cb) {
-  var coveralls = require('gulp-coveralls');
-  return gulp
-    .src('./coverage/lcov.info')
-    .pipe(coveralls());
-});
-
 gulp.task('clean', function (cb) {
   require('rmdir-recursive').sync('./coverage');
   cb();
