@@ -60,9 +60,9 @@ You can define and use simple ASSET() function that only returns what it was giv
 function ASSET(s) {return s;}
 ```
 
-Following RegExp will allow you to replace template urls in Angular.js:
+Following expression will allow you to replace template urls in Angular.js:
 
-`/(?:url\(["']?(.*?)['"]?\)|src=["'](.*?)['"]|src=([^\s\>]+)(?:\>|\s)|href=["']([^'"]+?)['"]|href=([^\s\>]+)(?:\>|\s)|ASSET\(['"](.+)['"]\)|templateUrl\:\s*?["'](.*?)['"])/g`
+_RegExp_: `/(?:url\(["']?(.*?)['"]?\)|src=["'](.*?)['"]|src=([^\s\>]+)(?:\>|\s)|href=["']([^'"]+?)['"]|href=([^\s\>]+)(?:\>|\s)|ASSET\(['"](.+)['"]\)|templateUrl\:\s*?["'](.*?)['"])/g`
 
 #### cwd
 _Type_: `String`
@@ -79,7 +79,7 @@ _Usage_: Set this to override asset base paths. This is useful when dealing with
 #### dirs
 _Type_: `Array`
 
-_Usage_: Glob patterns which will be used to perform additional matching. Patterns are prepended to source paths.
+_Usage_: Glob dir patterns which will be used to perform additional matching. Patterns are prepended to source paths.
 
 _Default_: []
 
@@ -132,4 +132,4 @@ _Default_: 0
 
 ## License
 
-[MIT](http://opensource.org/licenses/MIT) © [Jure Žvelc](https://github.com/jzvelc)
+[MIT](https://github.com/jzvelc/gulp-revsolve/blob/master/LICENSE) © [Jure Žvelc](https://github.com/jzvelc)

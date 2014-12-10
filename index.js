@@ -6,8 +6,9 @@ module.exports = function (options) {
     gutil = require('gulp-util'),
     chalk = require('chalk'),
     istextorbinary = require('istextorbinary'),
-    options = options || {},
     assets = [];
+
+  options = options || {};
 
   options = _.assign({
     regex: /(?:url\(["']?(.*?)['"]?\)|src=["'](.*?)['"]|src=([^\s\>]+)(?:\>|\s)|href=["'](.*?)['"]|href=([^\s\>]+)(?:\>|\s)|ASSET\(['"](.+)['"]\))/g,
@@ -45,6 +46,7 @@ module.exports = function (options) {
     options.stripDestPrefix = options.stripDestPrefix.replace(/^\//, '');
   }
 
+  //noinspection JSUnusedLocalSymbols
   function transform(file, enc, cb) {
     var filePath;
 
@@ -101,7 +103,7 @@ module.exports = function (options) {
 
       content = content.replace(options.regex, function (str) {
         var items, found, url, match, suffix,
-          oldPath, newPath, absolutePath, relativePath, replaced, matched, temp;
+          oldPath, newPath, absolutePath, relativePath, replaced, matched;
 
         items = _.values(arguments);
         items.shift();
