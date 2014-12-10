@@ -1,3 +1,8 @@
+[![NPM version](https://badge.fury.io/js/gulp-revsolve.svg)](http://badge.fury.io/js/gulp-revsolve)
+[![Build Status](https://travis-ci.org/jzvelc/gulp-revsolve.svg?branch=master)](https://travis-ci.org/jzvelc/gulp-revsolve)
+[![Dependency Status](https://david-dm.org/jzvelc/gulp-revsolve.svg?theme=shields.io)](https://david-dm.org/jzvelc/gulp-revsolve)
+[![devDependency Status](https://david-dm.org/jzvelc/gulp-revsolve/dev-status.svg?theme=shields.io)](https://david-dm.org/jzvelc/gulp-revsolve#info=devDependencies)
+
 # [gulp](http://gulpjs.com)-revsolve
 
 Resolves all asset references to absolute paths. Assets processed
