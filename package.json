@@ -28,7 +28,7 @@
   "main": "index.js",
   "scripts": {
     "test": "gulp test",
-    "coveralls": "gulp test && gulp coveralls && gulp clean"
+    "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info && gulp coveralls && gulp clean"
   },
   "dependencies": {
     "chalk": "^0.5.1",
