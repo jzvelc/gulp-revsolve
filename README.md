@@ -141,13 +141,13 @@ _Type_: `Integer`
 
 _Usage_: Activate debug mode by specifying verbosity.
 
-_Values_: 0, 1, 2, 3
-
 _Default_: 0
 
+_Verbosity levels_:
+
 - 0: disabled
-- 1: log resolved paths
-- 2: log unresolved paths
+- 1: log resolved assets
+- 2: log unresolved assets
 - 3: log all
 
 ## License
