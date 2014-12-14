@@ -10,6 +10,7 @@ var
   es = require('event-stream'),
   it = require('mocha').it,
   expect = require('chai').expect,
+  assert = require('chai').assert,
   gutil = require('gulp-util'),
   through = require('through2'),
   revsolve = require('../');
@@ -58,12 +59,10 @@ describe('gulp-revsolve', function () {
 
   it('should fail with stream', function (cb) {
     var stream = revsolve();
-
     stream.on('error', function (err) {
       expect(err.message).to.equal('Streaming is not supported');
       cb();
     });
-
     stream.write(new gutil.File({
       path: 'unicorn.css',
       contents: through()
@@ -87,7 +86,8 @@ describe('gulp-revsolve', function () {
 
   it('should skip unmentioned files', function (cb) {
     gulp
-      .src([input('styles/style.css'), input('images/*.*'), input('fonts/*.*')], { base: input() })
+      .src([input('styles/style.css'), input('images/*.*'),
+        input('fonts/*.*')], { base: input() })
       .pipe(revsolve({ skipUnmentioned: true }))
       .on('data', function (f) {
         expect(path.basename(f.path)).not.to.equal('cat.png');
@@ -101,13 +101,14 @@ describe('gulp-revsolve', function () {
   it('should resolve paths', function (cb) {
     var filter = require('gulp-filter')('**/*.css');
     gulp
-      .src([input('styles/style.css'), input('images/*.*'), input('fonts/*.*')], { base: input() })
+      .src([input('styles/style.css'), input('images/*.*'),
+        input('fonts/*.*')], { base: input() })
       .pipe(revsolve())
       .pipe(filter)
       .pipe(require('gulp-rename')({ basename: 'style' }))
       .pipe(gulp.dest(output()))
       .on('end', function () {
-        expect(output('styles/style.css')).to.be.a.file().and.not.empty;
+        assert.notIsEmptyFile(output('styles/style.css'));
         expect(output('styles/style.css')).to.have.content(content(fixture('styles/style-no-rev.css')));
         cb();
       });
@@ -115,7 +116,6 @@ describe('gulp-revsolve', function () {
 
   it('should resolve revisioned paths', function (cb) {
     var filter = require('gulp-filter')('**/*.css');
-
     es.merge(
       gulp
         .src([input('styles/style.css'), input('images/*.*')],
@@ -129,7 +129,7 @@ describe('gulp-revsolve', function () {
       .pipe(require('gulp-rename')({ basename: 'style' }))
       .pipe(gulp.dest(output()))
       .on('end', function () {
-        expect(output('styles/style.css')).to.be.a.file().and.not.empty;
+        assert.notIsEmptyFile(output('styles/style.css'));
         expect(output('styles/style.css')).to.have.content(content(fixture('styles/style-all-rev.css')));
         cb();
       });
@@ -137,7 +137,6 @@ describe('gulp-revsolve', function () {
 
   it('should resolve only revisioned paths', function (cb) {
     var filter = require('gulp-filter')('**/*.css');
-
     es.merge(
       gulp
         .src([input('styles/style.css'), input('images/*.*')],
@@ -151,7 +150,7 @@ describe('gulp-revsolve', function () {
       .pipe(require('gulp-rename')({ basename: 'style' }))
       .pipe(gulp.dest(output()))
       .on('end', function () {
-        expect(output('styles/style.css')).to.be.a.file().and.not.empty;
+        assert.notIsEmptyFile(output('styles/style.css'));
         expect(output('styles/style.css')).to.have.content(content(fixture('styles/style-only-rev.css')));
         cb();
       });
@@ -160,13 +159,14 @@ describe('gulp-revsolve', function () {
   it('should resolve and strip src prefix', function (cb) {
     var filter = require('gulp-filter')('**/*.css');
     gulp
-      .src([input('styles/style.css'), input('images/*.*'), input('fonts/*.*')], { base: input() })
+      .src([input('styles/style.css'), input('images/*.*'),
+        input('fonts/*.*')], { base: input() })
       .pipe(revsolve({ cwd: './test/input', base: './test/input', stripSrcPrefix: '/strip/' }))
       .pipe(filter)
       .pipe(require('gulp-rename')({ basename: 'style' }))
       .pipe(gulp.dest(output()))
       .on('end', function () {
-        expect(output('styles/style.css')).to.be.a.file().and.not.empty;
+        assert.notIsEmptyFile(output('styles/style.css'));
         expect(output('styles/style.css')).to.have.content(content(fixture('styles/style-strip-src.css')));
         cb();
       });
@@ -175,13 +175,14 @@ describe('gulp-revsolve', function () {
   it('should resolve and strip dest prefix', function (cb) {
     var filter = require('gulp-filter')('**/*.css');
     gulp
-      .src([input('styles/style.css'), input('images/*.*'), input('fonts/*.*')], { base: input() })
+      .src([input('styles/style.css'), input('images/*.*'),
+        input('fonts/*.*')], { base: input() })
       .pipe(revsolve({ cwd: './test/input', base: './test/input', stripDestPrefix: '/images/' }))
       .pipe(filter)
       .pipe(require('gulp-rename')({ basename: 'style' }))
       .pipe(gulp.dest(output()))
       .on('end', function () {
-        expect(output('styles/style.css')).to.be.a.file().and.not.empty;
+        assert.notIsEmptyFile(output('styles/style.css'));
         expect(output('styles/style.css')).to.have.content(content(fixture('styles/style-strip-dest.css')));
         cb();
       });
@@ -190,13 +191,14 @@ describe('gulp-revsolve', function () {
   it('should resolve files matching specified pattern', function (cb) {
     var filter = require('gulp-filter')('**/*.css');
     gulp
-      .src([input('styles/style.css'), input('images/*.*'), input('fonts/*.*')], { base: input() })
+      .src([input('styles/style.css'), input('images/*.*'),
+        input('fonts/*.*')], { base: input() })
       .pipe(revsolve({ cwd: '.', base: '.', patterns: '**' }))
       .pipe(filter)
       .pipe(require('gulp-rename')({ basename: 'style' }))
       .pipe(gulp.dest(output()))
       .on('end', function () {
-        expect(output('styles/style.css')).to.be.a.file().and.not.empty;
+        assert.notIsEmptyFile(output('styles/style.css'));
         expect(output('styles/style.css')).to.have.content(content(fixture('styles/style-dirs.css')));
         cb();
       });
@@ -205,14 +207,61 @@ describe('gulp-revsolve', function () {
   it('should resolve files with non-matching base', function (cb) {
     var filter = require('gulp-filter')('**/*.css');
     gulp
-      .src([input('styles/style.css'), input('images/*.*'), input('fonts/*.*')], { base: input() })
+      .src([input('styles/style.css'), input('images/*.*'),
+        input('fonts/*.*')], { base: input() })
       .pipe(revsolve({ cwd: './test/input', base: './another-folder' }))
       .pipe(filter)
       .pipe(require('gulp-rename')({ basename: 'style' }))
       .pipe(gulp.dest(output()))
       .on('end', function () {
-        expect(output('styles/style.css')).to.be.a.file().and.not.empty;
+        assert.notIsEmptyFile(output('styles/style.css'));
         expect(output('styles/style.css')).to.have.content(content(fixture('styles/style-no-rev.css')));
+        cb();
+      });
+  });
+
+  it('should process only css files', function (cb) {
+    var filter = require('gulp-filter')('**/*.css');
+    es.merge(
+      gulp
+        .src(input('styles/style.css'), { base: input() })
+        .pipe(require('gulp-rev')()),
+      gulp
+        .src([input('images/*.*')], { base: input() })
+        .pipe(require('gulp-rev')()),
+      gulp
+        .src([input('fonts/*.*')], { read: false, base: input() })
+    )
+      .pipe(revsolve({ cwd: './test/input', base: input(), filterExtensions: 'css' }))
+      .pipe(filter)
+      .pipe(require('gulp-rename')({ basename: 'style' }))
+      .pipe(gulp.dest(output()))
+      .on('end', function () {
+        assert.notIsEmptyFile(output('styles/style.css'));
+        expect(output('styles/style.css')).to.have.content(content(fixture('styles/style-all-rev.css')));
+        cb();
+      });
+  });
+
+  it('should ignore css files', function (cb) {
+    var filter = require('gulp-filter')('**/*.css');
+    es.merge(
+      gulp
+        .src(input('styles/style.css'), { base: input() })
+        .pipe(require('gulp-rev')()),
+      gulp
+        .src([input('images/*.*')], { base: input() })
+        .pipe(require('gulp-rev')()),
+      gulp
+        .src([input('fonts/*.*')], { read: false, base: input() })
+    )
+      .pipe(revsolve({ cwd: './test/input', base: input(), skipExtensions: 'css' }))
+      .pipe(filter)
+      .pipe(require('gulp-rename')({ basename: 'style' }))
+      .pipe(gulp.dest(output()))
+      .on('end', function () {
+        assert.notIsEmptyFile(output('styles/style.css'));
+        expect(output('styles/style.css')).to.have.content(content(input('styles/style.css')));
         cb();
       });
   });

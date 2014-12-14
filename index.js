@@ -1,87 +1,67 @@
+var _, path, through, gutil, chalk, istextorbinary;
+
 module.exports = function (options) {
-  var
-    _ = require('lodash'),
-    path = require('path'),
-    through = require('through2'),
-    gutil = require('gulp-util'),
-    chalk = require('chalk'),
-    istextorbinary = require('istextorbinary'),
-    assets = [];
+  var assets = [];
 
+  // Lazy load dependencies
+  if (!_) {
+    _ = require('lodash');
+  }
+  if (!path) {
+    path = require('path');
+  }
+  if (!through) {
+    through = require('through2');
+  }
+
+  // Set default options
   options = options || {};
-
   options = _.assign({
     regex: /(?:url\(["']?(.*?)['"]?\)|src=["'](.*?)['"]|src=([^\s\>]+)(?:\>|\s)|href=["'](.*?)['"]|href=([^\s\>]+)(?:\>|\s))/g,
     debug: 0,
     patterns: [],
+    filterExtensions: [],
+    skipExtensions: [],
     addSrcPrefix: '',
     addDestPrefix: '/',
     skipUnmentioned: false,
     resolveNonRev: true
   }, options);
 
+  // Set current working directory
   if (!options.cwd) {
     options.cwd = path.resolve('.');
   } else {
     options.cwd = path.resolve(options.cwd);
   }
 
+  // Ensure arrays
   if (_.isString(options.patterns)) {
     options.patterns = [options.patterns];
   }
+  if (_.isString(options.filterExtensions)) {
+    options.filterExtensions = [options.filterExtensions];
+  }
+  if (_.isString(options.skipExtensions)) {
+    options.skipExtensions = [options.skipExtensions];
+  }
 
+  // Make patterns relative
   for (var i = 0; i < options.patterns.length; i++) {
     options.patterns[i] = path.relative(options.cwd, options.patterns[i]);
   }
 
+  // Resolve base
   if (options.base) {
     options.base = path.resolve(options.base);
   }
 
+  // Remove trailing slash
   if (options.stripSrcPrefix) {
     options.stripSrcPrefix = options.stripSrcPrefix.replace(/^\//, '');
   }
-
   if (options.stripDestPrefix) {
     options.stripDestPrefix = options.stripDestPrefix.replace(/^\//, '');
-  }
-
-  //noinspection JSUnusedLocalSymbols
-  function transform(file, enc, cb) {
-    var filePath;
-
-    if (file.isNull()) {
-      cb(null, file);
-      return;
-    }
-    if (file.isStream()) {
-      cb(new gutil.PluginError('gulp-revsolve', 'Streaming is not supported'));
-      return;
-    }
-
-    assets.push(file);
-
-    // Get original file path
-    if (file.revOrigPath) {
-      filePath = file.revOrigPath;
-    } else {
-      filePath = file.path;
-    }
-
-    // Detect text files
-    istextorbinary.isText(filePath, file.contents, function(err, result) {
-      /* istanbul ignore if  */
-      if (err) {
-        cb(new gutil.PluginError('gulp-revsolve', 'Wrong content type of file `' + file.path + '`. ' + err));
-        return;
-      }
-      file.isTextFile = result;
-      cb();
-    });
-  }
-
-  function flush() {
-    replace(this);
   }
 
   function normalize(basePath, fullPath) {
@@ -92,7 +72,71 @@ module.exports = function (options) {
     }
   }
 
-  function replace(context) {
+  //noinspection JSUnusedLocalSymbols
+  function transform(file, enc, cb) {
+    var filePath;
+
+    if (file.isStream()) {
+      if (!gutil) {
+        gutil = require('gulp-util');
+      }
+      cb(new gutil.PluginError('gulp-revsolve', 'Streaming is not supported'));
+      return;
+    }
+
+    assets.push(file);
+
+    // Pass through empty files
+    if (file.isNull()) {
+      file.isTextFile = false;
+      cb(null, file);
+      return;
+    }
+
+    // Get original file path
+    if (file.revOrigPath) {
+      filePath = file.revOrigPath;
+    } else {
+      filePath = file.path;
+    }
+
+    // Detect text files
+    if (!istextorbinary) {
+      istextorbinary = require('istextorbinary');
+    }
+    istextorbinary.isText(filePath, file.contents, function(err, result) {
+      /* istanbul ignore if  */
+      if (err) {
+        if (!gutil) {
+          gutil = require('gulp-util');
+        }
+        cb(new gutil.PluginError('gulp-revsolve', 'Wrong content type of file `' + file.path + '`. ' + err));
+        return;
+      }
+
+      file.isTextFile = result;
+
+      // Filter text extensions
+      if (options.filterExtensions.length > 0) {
+        if (!_.contains(options.filterExtensions, path.extname(file.path).substr(1))) {
+          file.isTextFile = false;
+        }
+      }
+
+      // Skip text extensions
+      if (options.skipExtensions.length > 0) {
+        if (_.contains(options.skipExtensions, path.extname(file.path).substr(1))) {
+          file.isTextFile = false;
+        }
+      }
+
+      cb();
+    });
+  }
+
+  function flush(cb) {
+    var self = this;
+
     // Filter text files
     var sources = assets.filter(function (file) {
       return file.isTextFile;
@@ -132,7 +176,7 @@ module.exports = function (options) {
         }
 
         // Add prefix
-        url = options.addSrcPrefix + url;
+        url = path.join(options.addSrcPrefix, url);
 
         // Replace in assets
         _.forEach(assets, function (asset) {
@@ -176,7 +220,7 @@ module.exports = function (options) {
           /* istanbul ignore else  */
           if (matched) {
             if (options.skipUnmentioned) {
-              context.push(asset);
+              self.push(asset);
             }
 
             // Strip prefix
@@ -184,16 +228,28 @@ module.exports = function (options) {
               newPath = newPath.substring(options.stripDestPrefix.length, newPath.length);
             }
 
-            replaced = options.addDestPrefix + newPath + suffix;
+            replaced = path.join(options.addDestPrefix, newPath) + suffix;
 
             str = str.replace(found, replaced);
 
             /* istanbul ignore if  */
-            if (options.debug >= 1) {
+            if (options.debug === 1 || options.debug === 3) {
+              if (!gutil) {
+                gutil = require('gulp-util');
+              }
+              if (!chalk) {
+                chalk = require('chalk');
+              }
               gutil.log(chalk.magenta(normalize(file.base, file.path)) + ':');
               gutil.log(chalk.green(found) + ' ' + chalk.yellow('->') + ' ' + chalk.green(replaced));
             }
-          } else if (options.debug >= 2) {
+          } else if (options.debug === 2 || options.debug === 3) {
+            if (!gutil) {
+              gutil = require('gulp-util');
+            }
+            if (!chalk) {
+              chalk = require('chalk');
+            }
             gutil.log(chalk.red(normalize(file.base, file.path)) + ':');
             gutil.log(chalk.red(url) + ' ' + chalk.red('doesn\'t match') + ' ' + chalk.red(absolutePath) + ', ' + chalk.red(relativePath));
           }
@@ -204,17 +260,17 @@ module.exports = function (options) {
       file.contents = new Buffer(content);
 
       if (options.skipUnmentioned) {
-        context.push(file);
+        self.push(file);
       }
     });
 
     if (!options.skipUnmentioned) {
       _.forEach(assets, function (asset) {
-        context.push(asset);
+        self.push(asset);
       });
     }
 
-    context.emit('end');
+    cb();
   }
 
   return through.obj(transform, flush);
