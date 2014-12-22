@@ -1,6 +1,6 @@
 {
   "name": "gulp-revsolve",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Asset resolver and gulp-rev helper.",
   "keywords": [
     "gulp",
