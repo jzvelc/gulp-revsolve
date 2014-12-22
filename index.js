@@ -224,11 +224,12 @@ module.exports = function (options) {
             }
 
             // Strip prefix
+            newPath = newPath.split(path.sep).join('/');
             if (options.stripDestPrefix && options.stripDestPrefix === newPath.slice(0, options.stripDestPrefix.length)) {
               newPath = newPath.substring(options.stripDestPrefix.length, newPath.length);
             }
 
-            replaced = path.join(options.addDestPrefix, newPath) + suffix;
+            replaced = path.join(options.addDestPrefix, newPath).split(path.sep).join('/') + suffix;
 
             str = str.replace(found, replaced);
 
